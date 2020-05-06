@@ -1,0 +1,50 @@
+{
+	"sqlInstance": [
+		{
+			"server": "<<ADD SERVER NAME>>",
+			"Database": "<<ADD DATABASE NAME>>"
+		}
+	],
+	"tables":[
+		{
+			"adUserAccounts":[
+				{
+					"DateAdded":"[datetime] NOT NULL",
+					"DateAssessed":"[datetime] NOT NULL",
+					"Include":"[int] NOT NULL",
+					"givenName":"[varchar](max) NOT NULL",
+					"surname":"[varchar](max) NOT NULL",
+					"name":"[varchar](max) NOT NULL",
+					"samAccountName":"[varchar](max) NOT NULL",
+					"userPrincipalName":"[varchar](max) NOT NULL",
+					"emailAddress":"[varchar](max) NULL",
+					"distinguishedName":"[varchar](max) NULL",
+					"objectClass":"[varchar](max) NULL",
+					"objectGUID":"[varchar](max) NULL",
+					"SID":"[varchar](max) NULL",
+					"manager":"[varchar](max) NULL",
+					"title":"[varchar](max) NULL",
+					"company":"[varchar](max) NULL",
+					"enabled":"[varchar](max) NULL",
+					"passwordLastSet":"[datetime] NULL",
+					"passwordNeverExpires":"[varchar](max) NULL",
+					"whenCreated":"[datetime] NULL",
+					"whenChanged":"[datetime] NULL",
+					"accountExpirationDate":"[datetime] NULL",
+					"accountNeverExpires":"[varchar](max) NULL"
+				}
+			],
+			"adGroupMemberships":[
+				{
+					"DateAdded":"[datetime] NULL",
+					"DateAssessed":"[datetime] NULL",
+					"Include":"[int] NULL",
+					"groupName":"[varchar](max) NULL",
+					"groupDN":"[varchar](max) NULL",
+					"samAccountName":"[varchar](max) NULL",
+					"userSID":"[varchar](max) NULL"
+				}
+			]
+		}
+	]
+}		

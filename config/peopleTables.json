@@ -1,0 +1,78 @@
+{
+	"sqlInstance": [
+		{
+			"server": "<<ADD SERVER NAME>>",
+			"Database": "<<ADD DATABASE NAME>>"
+		}
+	],
+	"tables":[
+		{
+			"people":[
+				{
+					"DateAdded":"[datetime] NULL",
+					"DateAssessed":"[datetime] NULL",
+					"Include":"[int] NULL",
+					"email":"[varchar](max) NULL",
+					"employeeNumber":"[int] NULL",
+					"FirstName":"[varchar](max) NULL",
+					"LastName":"[varchar](max) NULL",
+					"Location":"[varchar](max) NULL",
+					"LegalFirstname":"[varchar](max) NULL",
+					"LegalLastname":"[varchar](max) NULL",
+					"managerEmail":"[varchar](max) NULL"
+				}
+			],
+			"policyTraining":[
+				{
+					"DateAdded":"[datetime] NULL",
+					"DateAssessed":"[datetime] NULL",
+					"Include":"[int] NULL",
+					"CurriculumName":"[varchar](max) NULL",
+					"Email":"[varchar](max) NULL",
+                    "RegistrationDate":"[datetime] NULL",
+                    "CompletionStatus":"[varchar](max) NOT NULL",
+                    "CompletionDate":"[datetime] NULL",
+                    "CurriculumDueDate":"[datetime] NULL"
+
+				}
+			],
+			"securityAwareness":[
+				{
+					"DateAdded":"[datetime] NULL",
+					"DateAssessed":"[datetime] NULL",
+					"Include":"[int] NULL",
+					"Curriculum Name":"[varchar](max) NULL",
+					"Email":"[varchar](max) NULL",
+                    "Registration Date":"[datetime] NULL",
+                    "Completion Status":"[varchar](max) NOT NULL",
+                    "Completion Date":"[datetime] NULL",
+                    "Curriculum Due Date":"[datetime] NULL"
+				}
+			],
+			"phishingResults":[
+				{
+					"DateAdded":"[datetime] NULL",
+					"DateAssessed":"[datetime] NULL",
+					"Include":"[int] NULL",
+					"Email":"[varchar](max) NULL",
+					"Clicked at":"[datetime] NULL",
+					"Replied at":"[datetime] NULL",
+					"Data entered at":"[datetime] NULL",
+					"Attachment opened at":"[datetime] NULL",
+					"Macro enabled at":"[datetime] NULL",
+					"Opened at":"[datetime] NULL",
+					"Reported":"[datetime] NULL",
+					"Scheduled":"[datetime] NULL",
+					"Delivered at":"[datetime] NULL",
+					"IP Address":"[varchar](max) NULL",
+					"Browser":"[varchar](max) NULL",
+					"Browser Version":"[varchar](max) NULL",
+					"Operating System":"[varchar](max) NULL",
+					"Email Template":"[varchar](max) NULL",
+					"Risk Booster":"[varchar](max) NULL",
+					"Risk Score":"[varchar](max) NULL"
+				}
+			]
+		}
+	]
+}		

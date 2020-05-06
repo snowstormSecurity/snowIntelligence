@@ -1,0 +1,54 @@
+{
+	"sqlInstance": [
+		{
+			"server": "<<ADD SERVER NAME>>",
+			"Database": "<<ADD DATABASE NAME>>"
+		}
+	],
+	"tables":[
+		{
+			"measurementsPeople":[
+				{
+					"DateAdded":"[datetime] NOT NULL",
+					"DateAssessed":"[datetime] NOT NULL",
+					"Include":"[int] NOT NULL",
+                    "MeasurementID":"[varchar](max) NULL",
+                    "MeasurementVersion":"[varchar](max) NULL",
+                    "MeasurementSource":"[varchar](max) NULL",
+                    "MeasurementValue":"[varchar](max) NULL"
+				}
+			],
+			"measurementsSystems":[
+				{
+					"DateAdded":"[datetime] NOT NULL",
+					"DateAssessed":"[datetime] NOT NULL",
+					"Include":"[int] NOT NULL",
+                    "MeasurementID":"[varchar](max) NULL",
+                    "MeasurementVersion":"[varchar](max) NULL",
+                    "MeasurementSource":"[varchar](max) NULL",
+                    "MeasurementValue":"[varchar](max) NULL"
+				}
+			],
+			"measurementDetails":[
+				{
+					"DateAdded":"[datetime] NULL",
+					"DateAssessed":"[datetime] NULL",
+					"Include":"[int] NULL",
+                    "isCurrent":"[int] NULL",
+                    "MeasurementID":"[varchar](max) NULL",
+                    "MeasurementVersion":"[int] NULL",
+                    "Title":"[varchar](max) NULL",
+                    "Scope":"[varchar](max) NULL",
+                    "Type":"[varchar](max) NULL",
+                    "Goal":"[varchar](max) NULL",
+                    "TargetValue":"[varchar](max) NULL",
+                    "ImplementationEvidence":"[varchar](max) NULL",
+                    "Frequency":"[varchar](max) NULL",
+                    "infoOwner":"[varchar](max) NULL",
+                    "infoCollector":"[varchar](max) NULL",
+                    "infoCustomer":"[varchar](max) NULL"
+				}
+			]
+		}
+	]
+}		

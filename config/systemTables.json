@@ -1,0 +1,97 @@
+{
+	"sqlInstance": [
+		{
+			"server": "<<ADD SERVER NAME>>",
+			"Database": "<<ADD DATABASE NAME>>"
+		}
+	],
+	"tables":[
+		{
+			"assets":[
+				{
+					"DateAdded":"[datetime] NOT NULL",
+					"DateAssessed":"[datetime] NOT NULL",
+					"Include":"[int] NOT NULL",
+					"ID":"[bigint] NOT NULL",
+					"Hostname":"[varchar](max) NOT NULL",
+					"Description":"[varchar](max) NOT NULL",
+					"State":"[varchar](max) NOT NULL",
+					"Site":"[varchar](max) NOT NULL",
+					"SystemOwner":"[varchar](max) NULL",
+					"Type":"[varchar](max) NULL"
+				}
+			],
+			"vulnHost":[
+				{
+					"DateAdded":"[datetime] NULL",
+					"DateAssessed":"[datetime] NULL",
+					"Include":"[int] NULL",
+					"ipAddress":"[varchar](max) NULL",
+					"DNS":"[varchar](max) NULL",
+					"osCPE":"[varchar](max) NULL",
+					"DateScan":"[datetime] NULL",
+					"NetBIOS":"[varchar](max) NULL",
+					"OperatingSystem":"[varchar](max) NULL",
+					"QID":"[bigint] NULL",
+					"FirstFound":"[datetime] NULL",
+					"LastFound":"[datetime] NULL",
+					"TimesFound":"[int] NULL",
+					"VulnStatus":"[varchar](max) NULL",
+					"Protocol":"[varchar](max) NULL",
+					"Port":"[int] NULL",
+					"cvssFinal":"[varchar](max) NULL",
+					"Title":"[varchar](max) NULL",
+					"Severity":"[int] NULL",
+					"Category":"[varchar](max) NULL",
+					"cvssBase":"[varchar](max) NULL",
+					"cvssTemp":"[varchar](max) NULL"
+				}
+			],
+			"policyControls":[
+				{
+					"DateAdded":"[datetime] NULL",
+					"ControlID":"[int] NULL",
+					"Statement":"[varchar](1500) NULL",
+					"Criticality":"[int] NULL"
+				}
+			],
+			"policy":[
+				{
+					"DateAdded":"[datetime] NULL",
+					"DateAssessed":"[datetime] NULL",
+					"Include":"[int] NULL",
+					"ControlID":"[int] NULL",
+					"Status":"[varchar](max) NULL",
+					"ipAddress":"[varchar](max) NULL",
+					"TrackingMethod":"[varchar](max) NULL",
+					"DNS":"[varchar](max) NULL",
+					"osCPE":"[varchar](max) NULL",
+					"NETBIOS":"[varchar](max) NULL",
+					"OperatingSystem":"[varchar](max) NULL",
+					"PolicyTitle":"[varchar](max) NULL"
+				}
+			],
+			"localGroupMembership":[
+				{
+					"DateAdded":"[datetime] NULL",
+					"DateAssessed":"[datetime] NULL",
+					"Include":"[int] NULL",
+					"groupName":"[varchar](max) NULL",
+					"Member":"[varchar](max) NULL",
+					"Hostname":"[varchar](max) NULL",
+					"Type":"[varchar](max) NULL"
+				}
+			],
+			"AppLocker":[
+				{
+					"DateAdded":"[datetime] NULL",
+					"DateAssessed":"[datetime] NULL",
+					"Include":"[int] NULL",
+					"hostname":"[varchar](max) NULL",
+					"Type":"[varchar](max) NULL",
+					"EnforcementMode":"[varchar](max) NULL"
+				}
+			]
+		}
+	]
+}		

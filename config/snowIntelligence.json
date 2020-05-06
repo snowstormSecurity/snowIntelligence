@@ -1,0 +1,519 @@
+{
+	"paths": [
+		{
+			"output": "C:\\<<OUTPUTPATH>>",
+			"results": "Results",
+			"rawFolder": "Raw",
+			"processedFolder": "Processed",
+			"errorFolder": "Error"
+		}
+	],
+	"populations":[
+		{
+			"assets":[
+				{
+					"SQLServer": "<<DB SERVER>>",
+					"Database": "snowIntelligence",
+					"Table": "Assets",
+					"GetAssetView": "SELECT * FROM activeServers",
+					"assetServer":"<<DB SERVER>>",
+					"assetDatabase": "<<ASSET DATABASE NAME>>",
+					"assetView":"SELECT RESOURCEID AS ID, Hostname AS Hostname, State, Site, SystemOwner, CIType AS Type FROM assetsTable GROUP BY RESOURCEID, Hostname, State, Site, SystemOwner, CIType"
+				}
+			],
+			"vulnerability":[
+				{
+					"SQLServer": "<<DB SERVER>>",
+					"Database": "snowIntelligence",
+					"Table": "vulnHost",
+					"url": "<<QUALYS API URL>>",
+					"assetGroup":"All Systems",
+					"templateID":<<QUALYS TEMPLATE ID>>,
+					"username": "<<QUALYSID>>",
+					"password":"<<PLAIN TEXT SECURE STRING>>"
+				}
+			],
+			"policyServerOSs": [
+				{
+					"SQLServer": "<<DB SERVER>>",
+					"Database": "snowIntelligence",
+					"Table": "policy",
+					"TableControls":"policyControls",
+					"url": "<<QUALYS API URL>>",
+					"assetGroup":"All Systems",
+					"templateID":<<QUALYS TEMPLATE ID>>,
+					"policyID":<<QUALYS POLICY ID>>,
+					"username": "<<QUALYSID>>",
+					"password":"<<PLAIN TEXT SECURE STRING>>"
+				}
+			],
+			"localGroupMembership": [
+				{
+					"SQLServer": "<<DB SERVER>>",
+					"Database": "snowIntelligence",
+					"Table": "localGroupMembership",
+					"assetServer":"<<DB SERVER>>",
+					"assetDatabase":"snowIntelligence",
+					"assetSQL":"SELECT [Hostname] FROM [snowIntelligence].[dbo].[assets] WHERE [State] = 'In Use' AND [Type]='Windows Server' ORDER BY [hostname]"
+				}
+			],
+			"appLocker":[
+				{
+					"SQLServer": "<<DB SERVER>>",
+					"Database": "snowIntelligence",
+					"Table": "AppLocker",
+					"GetAssetView": "SELECT * FROM activeServers",
+					"assetServer":"<<DB SERVER>>",
+					"assetDatabase": "ITMASTER",
+					"assetView":"SELECT Hostname AS Hostname FROM assetsTable GROUP BY Hostname"
+				}
+			],			
+			"adUserAccounts": [
+				{
+					"SQLServer": "<<DB SERVER>>",
+					"Database": "snowIntelligence",
+					"Table": "adUserAccounts",
+					"adRecordSize":"100000"
+				}
+			],
+			"adGroupMemberships":[
+				{
+					"SQLServer": "<<DB SERVER>>",
+					"Database": "snowIntelligence",
+					"Table": "adGroupMemberships",
+					"adRecordSize":"100000"
+				}
+			],
+			"people":[
+				{
+					"SQLServer": "<<DB SERVER>>",
+					"Database": "snowIntelligence",
+					"Table": "people",
+					"hrServer":"<<DB SERVER>>",
+					"hrDatabase":"<<HR DATABASE>>",
+					"hrSQL":"SELECT [EMAIL] as Email,[NAME_FAM_FIRST] as FirstName,[NAME_FAM_LAST] as Lastname, EmployeeNumber,[LOCATION] as Location,[NAME_LEG_FIRST] as LegalFirstName,[NAME_LEG_LAST] as LegalLastName,[HR_SUPERVISOR_EMAIL] as managerEmail FROM HRDatabase"
+				}
+			],
+			"securityAwareness":[
+				{
+					"SQLServer": "<<DB SERVER>>",
+					"Database": "snowIntelligence",
+					"Table": "securityAwareness"
+				}
+			],
+			"phishingResults":[
+				{
+					"SQLServer":"<<DB SERVER>>",
+					"Database":"snowIntelligence",
+					"Table":"phishingResults"
+				}
+			]
+		}
+	],
+	"measurements":[
+		{
+			"vulnScore_maxCVSS":[
+				{
+					"SQLServer":"<<DB SERVER>>",
+					"Database":"snowIntelligence",
+					"Table":"measurementsSystems",
+					"Version":[
+						{
+							"1":[
+								{
+									"Comments":"Grades the max CVSS Scores on an absoluate ratio",
+									"Query":"
+SELECT
+	dbo.assets.Hostname as [MeasurementSource]
+	,CASE
+		WHEN COUNT(dbo.vulnHost.cvssFinal) = 0 THEN 0
+		ELSE 100-ROUND(MAX(CAST([cvssFinal] AS DECIMAL(3,1))*10),0)
+	END as [MeasurementValue]
+FROM
+	dbo.assets LEFT OUTER JOIN dbo.vulnHost ON dbo.assets.Hostname = dbo.vulnHost.NetBIOS
+WHERE 
+	dbo.Assets.State = 'In Use'
+GROUP BY 
+	dbo.assets.Hostname
+"
+								}
+							],
+							"2":[
+								{
+									"Comments":"Grades the max CVSS Scores on a curve, based on the lowest average finalCVSS score in the environment",
+									"Query":"
+-- Calculate lowest avgCVSS
+DECLARE @curvePoints DECIMAL(3,1)
+SET @curvePoints=(SELECT
+	ROUND(MIN(CAST([cvssFinal] AS DECIMAL(3,1))),1) as [Min]
+FROM
+	dbo.assets LEFT OUTER JOIN dbo.vulnHost ON dbo.assets.Hostname = dbo.vulnHost.NetBIOS
+WHERE 
+	dbo.Assets.State = 'In Use' AND dbo.vulnHost.cvssFinal is not null and dbo.vulnHost.cvssFinal != '0'
+)
+
+-- Calculate Measurement Score based on avgCVSS (curve graded)
+SELECT
+	dbo.assets.Hostname as [MeasurementSource]
+	,CASE
+		WHEN COUNT(dbo.vulnHost.cvssFinal) = 0 THEN 0
+		ELSE (10-( ROUND(MAX(CAST([cvssFinal] AS DECIMAL(3,1))),1) )+@curvePoints)*10
+	END AS [MeasurementValue]
+FROM
+	dbo.assets LEFT OUTER JOIN dbo.vulnHost ON dbo.assets.Hostname = dbo.vulnHost.NetBIOS
+WHERE 
+	dbo.Assets.State = 'In Use'
+GROUP BY 
+	dbo.assets.Hostname
+"
+								}
+							],
+							"3":[
+								{
+									"Comments":"Grades the max CVSS Scores on a fixed grading scale based on NIST Severity ratings",
+									"Query":"
+									SELECT
+									dbo.assets.Hostname as [MeasurementSource]
+									,CASE
+										WHEN COUNT(dbo.vulnHost.cvssFinal) = 0 THEN 0
+										-- NIST CVSS Score 9.0 to 10 = CRITICAL
+										WHEN MAX(CAST([cvssFinal] AS DECIMAL(3,1))) >= 10 THEN 50
+										WHEN MAX(CAST([cvssFinal] AS DECIMAL(3,1))) >= 9 THEN 55
+										-- NIST CVSS Score 7.0 to 8.9 = HIGH
+										WHEN MAX(CAST([cvssFinal] AS DECIMAL(3,1))) >= 8 THEN 60
+										WHEN MAX(CAST([cvssFinal] AS DECIMAL(3,1))) >= 7 THEN 65
+										-- NIST CVSS Score 4.0 to 6.9 = MEDIUM
+										WHEN MAX(CAST([cvssFinal] AS DECIMAL(3,1))) >= 6 THEN 70
+										WHEN MAX(CAST([cvssFinal] AS DECIMAL(3,1))) >= 5 THEN 75
+										WHEN MAX(CAST([cvssFinal] AS DECIMAL(3,1)))>= 3 THEN 85
+										-- NIST CVSS Score 0.1 to 3.9 = Low
+										WHEN MAX(CAST([cvssFinal] AS DECIMAL(3,1)))>= 4 THEN 80
+										WHEN MAX(CAST([cvssFinal] AS DECIMAL(3,1)))>= 2 THEN 90
+										WHEN MAX(CAST([cvssFinal] AS DECIMAL(3,1)))>= 1 THEN 95
+										-- NIST CSVSS Score 0 = None
+										WHEN MAX(CAST([cvssFinal] AS DECIMAL(3,1)))= 0 THEN 100
+									END AS [MeasurementValue]
+								FROM
+									dbo.assets RIGHT OUTER JOIN dbo.vulnHost ON dbo.assets.Hostname = dbo.vulnHost.NetBIOS
+								WHERE 
+									dbo.Assets.State = 'In Use'
+								GROUP BY 
+									dbo.assets.Hostname
+"
+								}
+							]							
+						}
+					]
+				}
+			],
+			"vulnScore_avgCVSS":[
+				{
+					"SQLServer":"<<DB SERVER>>",
+					"Database":"snowIntelligence",
+					"Table":"measurementsSystems",
+					"Version":[
+						{
+							"1":[
+								{
+									"Comments":"Grades the average CVSS Scores on an absoluate ratio",
+									"Query":"
+SELECT
+	dbo.assets.Hostname as [MeasurementSource]
+	,CASE
+		WHEN COUNT(dbo.vulnHost.cvssFinal) = 0 THEN 0
+		ELSE 100-ROUND(AVG(CAST([cvssFinal] AS DECIMAL(3,1))*10),0)
+	END as [MeasurementValue]
+FROM
+	dbo.assets LEFT OUTER JOIN dbo.vulnHost ON dbo.assets.Hostname = dbo.vulnHost.NetBIOS
+WHERE 
+	dbo.Assets.State = 'In Use'
+GROUP BY 
+	dbo.assets.Hostname
+"
+								}
+							],
+							"2":[
+								{
+									"Comments":"Grades the average CVSS Scores on a curve, based on the lowest average finalCVSS score in the environment",
+									"Query":"
+-- Calculate lowest avgCVSS
+DECLARE @curvePoints DECIMAL(3,1)
+SET @curvePoints=(SELECT
+	ROUND(min(CAST([cvssFinal] AS DECIMAL(3,1))),1) as [Min]
+FROM
+	dbo.assets LEFT OUTER JOIN dbo.vulnHost ON dbo.assets.Hostname = dbo.vulnHost.NetBIOS
+WHERE 
+	dbo.Assets.State = 'In Use' AND dbo.vulnHost.cvssFinal is not null and dbo.vulnHost.cvssFinal != '0'
+)
+
+-- Calculate Measurement Score based on avgCVSS (curve graded)
+SELECT
+	dbo.assets.Hostname as [MeasurementSource]
+	,CASE
+		WHEN COUNT(dbo.vulnHost.cvssFinal) = 0 THEN 0
+		ELSE (10-( ROUND(avg(CAST([cvssFinal] AS DECIMAL(3,1))),1) )+@curvePoints)*10
+	END AS [MeasurementValue]
+FROM
+	dbo.assets LEFT OUTER JOIN dbo.vulnHost ON dbo.assets.Hostname = dbo.vulnHost.NetBIOS
+WHERE 
+	dbo.Assets.State = 'In Use'
+GROUP BY 
+	dbo.assets.Hostname
+"
+								}
+							],
+							"3":[
+								{
+									"Comments":"Grades the AVG CVSS Scores on a fixed grading scale based on NIST Severity ratings",
+									"Query":"
+									SELECT
+									dbo.assets.Hostname as [MeasurementSource]
+									,CASE
+										WHEN COUNT(dbo.vulnHost.cvssFinal) = 0 THEN 0
+										-- NIST CVSS Score 9.0 to 10 = CRITICAL
+										WHEN AVG(CAST([cvssFinal] AS DECIMAL(3,1))) >= 10 THEN 50
+										WHEN AVG(CAST([cvssFinal] AS DECIMAL(3,1))) >= 9 THEN 55
+										-- NIST CVSS Score 7.0 to 8.9 = HIGH
+										WHEN AVG(CAST([cvssFinal] AS DECIMAL(3,1))) >= 8 THEN 60
+										WHEN AVG(CAST([cvssFinal] AS DECIMAL(3,1))) >= 7 THEN 65
+										-- NIST CVSS Score 4.0 to 6.9 = MEDIUM
+										WHEN AVG(CAST([cvssFinal] AS DECIMAL(3,1))) >= 6 THEN 70
+										WHEN AVG(CAST([cvssFinal] AS DECIMAL(3,1))) >= 5 THEN 75
+										WHEN AVG(CAST([cvssFinal] AS DECIMAL(3,1)))>= 3 THEN 85
+										-- NIST CVSS Score 0.1 to 3.9 = Low
+										WHEN AVG(CAST([cvssFinal] AS DECIMAL(3,1)))>= 4 THEN 80
+										WHEN AVG(CAST([cvssFinal] AS DECIMAL(3,1)))>= 2 THEN 90
+										WHEN AVG(CAST([cvssFinal] AS DECIMAL(3,1)))>= 1 THEN 95
+										-- NIST CSVSS Score 0 = None
+										WHEN AVG(CAST([cvssFinal] AS DECIMAL(3,1)))= 0 THEN 100
+									END AS [MeasurementValue]
+								FROM
+									dbo.assets RIGHT OUTER JOIN dbo.vulnHost ON dbo.assets.Hostname = dbo.vulnHost.NetBIOS
+								WHERE 
+									dbo.Assets.State = 'In Use'
+								GROUP BY 
+									dbo.assets.Hostname
+"
+								}
+							]
+						}
+					]
+				}
+			],
+			"policyCompliance_score":[
+				{
+					"SQLServer":"<<DB SERVER>>",
+					"Database":"snowIntelligence",
+					"Table":"measurementsSystems",
+					"Version":[
+						{
+							"1":[
+								{
+									"Query":"
+SELECT * FROM (
+	SELECT 
+		[Hostname] as [MeasurementSource]
+		,CASE
+			WHEN CAST(([Passed] + [Failed] + [Unknown]) AS DECIMAL(15, 0)) = 0 THEN 0
+			ELSE CAST(100*(CAST([Passed] AS DECIMAL(15, 0)))/(CAST(([Passed] + [Failed] + [Unknown]) AS DECIMAL(15, 0))) AS DECIMAL(5,1))
+		END AS [MeasurementValue]
+	FROM
+		(
+			SELECT 
+				dbo.assets.Hostname
+				,dbo.policy.Status
+				,dbo.policy.ControlID
+			FROM 
+				dbo.assets LEFT OUTER JOIN dbo.policy ON dbo.assets.Hostname = dbo.policy.NETBIOS
+			WHERE
+				dbo.assets.State = 'In Use'
+		) AS SourceTable 
+	PIVOT 
+		(COUNT(ControlID) FOR Status IN ([Passed], [Failed], [Unknown])
+	) AS PivotTable
+) as Extra
+ORDER BY [MeasurementSource]
+"
+								}
+							]
+						}
+					]
+				}
+			],
+			"localAdministrator_Score":[
+				{
+					"SQLServer":"<<DB SERVER>>",
+					"Database":"snowIntelligence",
+					"Table":"measurementsSystems",
+					"Version":[
+						{
+							"1":[
+								{
+									"Query":"
+DECLARE @points INT
+DECLARE @maxCount INT
+DECLARE @normalCount INT
+SET @points=100
+SET @maxCOUNT=45
+SET @normalCount=25
+SELECT 
+MeasurementSource
+,CASE
+	WHEN COUNT([samAccountName])=0 THEN 0
+	WHEN (@points+((@normalCount-COUNT([samAccountName]))*(@points/(@maxCOUNT-@normalCount)))) > 100 THEN 100
+	WHEN (@points+((@normalCount-COUNT([samAccountName]))*(@points/(@maxCOUNT-@normalCount)))) < 0 THEN 0
+	ELSE (@points+((@normalCount-COUNT([samAccountName]))*(@points/(@maxCOUNT-@normalCount)))) 
+END AS MeasurementValue
+FROM (
+	SELECT
+		dbo.localGroupsMemberships_unwraveled.Hostname AS MeasurementSource
+		,dbo.localGroupsMemberships_unwraveled.samAccountName
+	FROM
+		dbo.localGroupsMemberships_unwraveled 
+		RIGHT OUTER JOIN dbo.assets ON dbo.localGroupsMemberships_unwraveled.Hostname = dbo.assets.Hostname
+	WHERE
+		(dbo.assets.State = 'In Use') AND (dbo.localGroupsMemberships_unwraveled.localGroup = 'Administrators')
+		OR
+		(dbo.assets.State = 'In Use') AND (dbo.localGroupsMemberships_unwraveled.localGroup IS NULL)
+		OR
+		(dbo.assets.State = 'In Use') AND (dbo.localGroupsMemberships_unwraveled.localGroup = 'Null')
+	GROUP BY
+		dbo.localGroupsMemberships_unwraveled.Hostname, 
+		dbo.localGroupsMemberships_unwraveled.samAccountName
+	) as RAW
+GROUP BY MeasurementSource
+",
+									"Comments":"
+										@points = The maximum number of points
+										@normalCount = A normal count of administrator accounts, including service accounts 
+										@maxCount = The max ammount of accounts, which results in zero points.  
+										Anything under @normalCounts gets full points.  Anything over @maxCount gets 0 points.  Everything in between is pro-rated for points."
+								}
+							]
+						}
+					]
+				}
+			],
+			"phishing_Score":[
+				{
+					"SQLServer":"<<DB SERVER>>",
+					"Database":"snowIntelligence",
+					"Table":"measurementsPeople",
+					"Version":[
+						{
+							"1":[
+								{
+									"Query":"
+									SELECT 
+										MeasurementSource
+										,AVG(MeasurementValue) as MeasurementValue
+									FROM (
+										SELECT 
+											Email as MeasurementSource
+											,CASE
+												WHEN [ClickScore] + [OpenedScore] + [RepliedScore] + [DataEnteredScore] + [AttachmentOpenedScore] + [MacroScore] + [ReportedScore] > 100 THEN 100
+												ELSE [ClickScore] + [OpenedScore] + [RepliedScore] + [DataEnteredScore] + [AttachmentOpenedScore] + [MacroScore] + [ReportedScore]
+											END AS MeasurementValue
+										FROM (
+											SELECT TOP (10000) 
+												[Email]
+												,CASE
+													WHEN [Clicked at] = '1900-01-01 00:00:00' THEN 5 ELSE 0
+												END AS [ClickScore]
+												,CASE
+													WHEN [Opened at]= '1900-01-01 00:00:00' THEN 5 ELSE 0
+												END AS [OpenedScore]
+												,CASE
+													WHEN [Replied at] = '1900-01-01 00:00:00' THEN 15 ELSE 0
+												END AS [RepliedScore]
+												,CASE
+													WHEN [Data entered at] = '1900-01-01 00:00:00' THEN 15 ELSE 0
+												END AS [DataEnteredScore]
+												,CASE
+													WHEN [Attachment opened at]= '1900-01-01 00:00:00' THEN 15 ELSE 0
+												END AS [AttachmentOpenedScore]
+												,CASE
+													WHEN [Macro enabled at]= '1900-01-01 00:00:00' THEN 15 ELSE 0
+												END AS [MacroScore]
+												,CASE
+													WHEN [Reported] = '1900-01-01 00:00:00' THEN 0 ELSE 30
+												END AS [ReportedScore]
+											FROM [phishingResults]
+										) as RawResults
+									) as FinalResults
+									GROUP BY 
+										MeasurementSource
+									ORDER BY 
+										MeasurementSource"
+								}
+							]
+						}
+					]
+				}
+			],
+			"securityAwareness_Score":[
+				{
+					"SQLServer":"<<DB SERVER>>",
+					"Database":"snowIntelligence",
+					"Table":"measurementsPeople",
+					"Version":[
+						{
+							"1":[
+								{
+									"Query":"
+									SELECT
+										MeasurementSource
+										,AVG([MeasurementValue]) as [MeasurementValue]
+									FROM (
+										SELECT
+											[Curriculum Name]
+											,[Email] as MeasurementSource
+											,CASE
+												WHEN [Completion Status] = 'Not Started' THEN 0
+												WHEN ([Completion Status] = 'In Progress' AND [Curriculum Due Date] < GetDATE()) THEN 0
+												WHEN ([Completion Status] = 'Complete' AND [Curriculum Due Date] >= [Completion Date]) THEN 100
+												WHEN ([Completion Date] > [Curriculum Due Date]) THEN 25
+											END AS MeasurementValue
+										FROM [snowIntelligence].[dbo].[securityAwareness]
+									) as tmp
+									GROUP BY [MeasurementSource]"
+								}
+							]
+						}
+					]
+				}
+			],
+			"appLocker_exe":[
+				{
+					"SQLServer":"<<DB SERVER>>",
+					"Database":"snowIntelligence",
+					"Table":"measurementsSystems",
+					"Version":[
+						{
+							"1":[
+								{
+									"Query":"
+SELECT 
+dbo.AppLocker.[hostname] AS [MeasurementSource]
+,CASE
+	WHEN [EnforcementMode] = 'Unknown' THEN 0
+	WHEN [EnforcementMode] = 'AuditOnly' THEN 75
+	WHEN [EnforcementMode] = 'NotConfigured' THEN 25
+	WHEN [EnforcementMode] = 'Enabled' THEN 100
+	ELSE 0
+END as [MeasurementValue]
+--FROM [snowIntelligence].[dbo].[AppLocker]
+FROM
+dbo.AppLocker RIGHT OUTER JOIN dbo.assets ON dbo.AppLocker.[hostname] = dbo.assets.[Hostname]
+WHERE
+dbo.assets.State = 'In Use' and dbo.AppLocker.Type = 'exe'
+"
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	]
+}
