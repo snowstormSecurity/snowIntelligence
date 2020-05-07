@@ -904,7 +904,7 @@ function get-snowIntelligenceADAccountInventory {
 	$populationName = 'adUserAccounts'
 	
 	#region Load Required Modules
-	if (($null -eq (Get-Module ActiveDirectory)) { Import-Module ActiveDirectory }
+	if ($null -eq (Get-Module ActiveDirectory)) { Import-Module ActiveDirectory }
 	#endregion
 
 	#region Load Configuration File
