@@ -15,7 +15,7 @@ Queries the `Assets` table within snowIntelligence for a list of systems to chec
 
 ## EXAMPLES
 ```powershell
-C:\PS> get-snowIntelligenceAppLocker | import-secInsightResults
+C:\PS> get-snowIntelligenceAppLocker | import-snowIntelligenceResults
 ```
 ## PARAMETERS
 

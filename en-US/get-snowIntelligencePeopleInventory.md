@@ -15,7 +15,7 @@ As individuals may have multiple accounts (e.g. IT, testers, etc...), a list of 
 
 ## EXAMPLES
 ```powershell
-C:\PS> get-snowIntelligencePeopleInventory  | import-secInsightResults
+C:\PS> get-snowIntelligencePeopleInventory  | import-snowIntelligenceResults
 ```
 ## PARAMETERS
 

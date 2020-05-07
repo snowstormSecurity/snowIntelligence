@@ -15,7 +15,7 @@ Collects a list of all Active Directory group, along with membership.
 
 ## EXAMPLES
 ```powershell
-C:\PS> get-snowIntelligenceADGroupMembership  | import-secInsightResults
+C:\PS> get-snowIntelligenceADGroupMembership  | import-snowIntelligenceResults
 ```
 ## PARAMETERS
 

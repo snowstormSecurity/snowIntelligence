@@ -15,7 +15,7 @@ Asset collection is used by other population processes as the source of truth fo
 
 ## EXAMPLES
 ```powershell
-C:\PS> get-snowIntelligenceAssetInventory  | import-secInsightResults
+C:\PS> get-snowIntelligenceAssetInventory  | import-snowIntelligenceResults
 ```
 ## PARAMETERS
 

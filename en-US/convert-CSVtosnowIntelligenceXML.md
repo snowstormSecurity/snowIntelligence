@@ -16,7 +16,7 @@ This process returns the same object type as the other collection scripts, which
 ### EXAMPLE 1
 
 ```powershell
-C:\PS> convert-CSVtoSecInsightXML -path <secAwarenessPath> | import-secInsightResults
+C:\PS> convert-CSVtosnowIntelligenceXML -path <secAwarenessPath> | import-snowIntelligenceResults
 ```
 
 ## PARAMETERS

@@ -15,7 +15,7 @@ This population is used to map Active Directory groups to local groups to show a
 
 ## EXAMPLES
 ```powershell
-C:\PS> get-snowIntelligenceLocalGroupMemberInventory  | import-secInsightResults
+C:\PS> get-snowIntelligenceLocalGroupMemberInventory  | import-snowIntelligenceResults
 ```
 ## PARAMETERS
 

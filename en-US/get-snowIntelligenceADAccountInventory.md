@@ -13,7 +13,7 @@ get-snowIntelligenceADAccountInventory [[-configurationFile] <String>] [<CommonP
 
 ## EXAMPLES
 ```powershell
-C:\PS> get-snowIntelligenceADAccountInventory  | import-secInsightResults
+C:\PS> get-snowIntelligenceADAccountInventory  | import-snowIntelligenceResults
 ```
 ## PARAMETERS
 

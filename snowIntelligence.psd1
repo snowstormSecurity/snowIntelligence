@@ -88,7 +88,7 @@
 	ModuleList = @()
 	
 	# List of all files packaged with this module
-	FileList = @('secInsight.psm1', 'secInsight.psd1')
+	FileList = @('snowIntelligence.psm1', 'snowIntelligence.psd1')
 	
 	# Private data to pass to the module specified in ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
 	PrivateData = @{
