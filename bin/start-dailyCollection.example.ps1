@@ -1,21 +1,21 @@
-new-secInsightFolderStructure
+new-snowIntelligenceFolderStructure
 
 ### SYSTEM COLLECTION ###
-get-secInsightAssetInventory | import-SecInsightResults
-get-secInsightVulnerabilityInventory | import-SecInsightResults
+get-snowIntelligenceAssetInventory | import-snowIntelligenceResults
+get-snowIntelligenceVulnerabilityInventory | import-snowIntelligenceResults
 
-get-secInsightPolicyComplianceInventory -populationName 'policyServerOSs' | import-SecInsightResults
+get-snowIntelligencePolicyComplianceInventory -populationName 'policyServerOSs' | import-snowIntelligenceResults
 
-get-secInsightLocalGroupMemberInventory -verbose | import-SecInsightResults
-get-SecInsightAppLocker  -verbose | import-SecInsightResults
+get-snowIntelligenceLocalGroupMemberInventory -verbose | import-snowIntelligenceResults
+get-snowIntelligenceAppLocker  -verbose | import-snowIntelligenceResults
 
 ### ACCOUNT COLLECTION ###
-get-secInsightADAccountInventory | import-SecInsightResults
-get-secInsightADGroupMembership | import-SecInsightResults
+get-snowIntelligenceADAccountInventory | import-snowIntelligenceResults
+get-snowIntelligenceADGroupMembership | import-snowIntelligenceResults
 
 ### PEOPLE COLLECTION ###
-get-secInsightPeopleInventory | import-SecInsightResults
+get-snowIntelligencePeopleInventory | import-snowIntelligenceResults
 
-convert-CSVtoSecInsightXML -path <secAwarenessPath> | import-secInsightResults
-convert-CSVtoSecInsightXML -path <PhishingPath> | import-secInsightResults
+convert-CSVtosnowIntelligenceXML -path <secAwarenessPath> | import-snowIntelligenceResults
+convert-CSVtosnowIntelligenceXML -path <PhishingPath> | import-snowIntelligenceResults
 
