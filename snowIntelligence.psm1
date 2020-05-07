@@ -634,7 +634,7 @@ function get-snowIntelligencePolicyComplianceInventory {
 	if ((test-path $configurationFile) -eq $false) { Write-Error "Unable to load configuration file $configurationFile"; break }
 	$snowIntelligenceConfiguration = get-content $configurationFile -Raw | ConvertFrom-Json
 	$policyConfiguration = $snowIntelligenceConfiguration.$scriptType.$populationName
-	if($policyConfiguration -eq $null){Write-Error "Unable to find $populationName";break}
+	if($null -eq $policyConfiguration){Write-Error "Unable to find $populationName";break}
 	#endregion
 	
 	#region Define Output Information
@@ -904,7 +904,7 @@ function get-snowIntelligenceADAccountInventory {
 	$populationName = 'adUserAccounts'
 	
 	#region Load Required Modules
-	if ((Get-Module ActiveDirectory) -eq $null) { Import-Module ActiveDirectory }
+	if (($null -eq (Get-Module ActiveDirectory)) { Import-Module ActiveDirectory }
 	#endregion
 
 	#region Load Configuration File
@@ -945,7 +945,7 @@ function get-snowIntelligenceADGroupMembership{
 	$populationName = 'adGroupMemberships'
 	
 	#region Load Required Modules
-	if ((Get-Module ActiveDirectory) -eq $null) { Import-Module ActiveDirectory }
+	if ($null -eq (Get-Module ActiveDirectory)) { Import-Module ActiveDirectory }
 	#endregion
 	
 	#region Load Configuration File
